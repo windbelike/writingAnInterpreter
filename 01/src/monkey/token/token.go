@@ -3,8 +3,13 @@ package token
 type TokenType string
 
 var keywords = map[string]TokenType{
-	"fn":  FUNCTION,
-	"let": LET,
+	"fn":     FUNCTION,
+	"let":    LET,
+	"true":   TRUE,
+	"false":  FALSE,
+	"if":     IF,
+	"else":   ELSE,
+	"return": RETURN,
 }
 
 // apart user-defined identifier from language keywords
@@ -36,6 +41,7 @@ const (
 
 	EQ     = "=="
 	NOT_EQ = "!="
+	
 
 	// Delimiters
 	COMMA     = ","
