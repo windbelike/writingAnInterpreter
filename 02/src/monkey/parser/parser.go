@@ -57,13 +57,13 @@ func New(l *lexer.Lexer) *Parser {
 		errors: []string{},
 	}
 
-
-		// prefix expression parser
+	// prefix expression parser
 	p.prefixParseFns = make(map[token.TokenType]prefixParseFn)
-	p.registerPrefix(token.IDENT, p.parseIdentifier)
-	p.registerPrefix(token.INT, p.parseIntegerLiteral)
-	p.registerPrefix(token.BANG, p.parsePrefixExpression)
-	p.registerPrefix(token.MINUS, p.parsePrefixExpression)
+	// It's noteworthy that identifier and integer literal are prefix expressions.
+	p.registerPrefix(token.IDENT, p.parseIdentifier) 
+	p.registerPrefix(token.INT, p.parseIntegerLiteral) 
+	p.registerPrefix(token.BANG, p.parsePrefixExpression) 
+	p.registerPrefix(token.MINUS, p.parsePrefixExpression) 
 
 	// infix expression parser
 	p.infixParseFns = make(map[token.TokenType]infixParseFn)
@@ -119,7 +119,7 @@ func (p *Parser) ParseProgram() *ast.Program {
 	return program
 }
 
-// In Monkey language there're 3 Statement only
+// In Monkey language there're only 3 Statements only
 func (p *Parser) parseStatement() ast.Statement {
 	switch p.curToken.Type {
 	case token.LET:
@@ -158,26 +158,52 @@ func (p *Parser) parseLetStatement() *ast.LetStatement {
 	return stmt
 }
 
-// -3 == -1
+// The core of expressiong parsing logic
 func (p *Parser) parseExpression(precedence int) ast.Expression {
 	// parsing prefix expression
-	prefix := p.prefixParseFns[p.curToken.Type]
-	if prefix == nil {
+	prefixFn := p.prefixParseFns[p.curToken.Type]
+	if prefixFn == nil {
 		p.noPrefixParseFnError(p.curToken.Type)
 		return nil
 	}
-	leftExp := prefix()
+	leftExp := prefixFn()
 
 	// parsing infix expression
+	// recursively finding the token has a higher precedence
 	for !p.peekTokenIs(token.SEMICOLON) && precedence < p.peekPrecedence() {
-		infix := p.infixParseFns[p.peekToken.Type]
-		if infix == nil {
+		infixFn := p.infixParseFns[p.peekToken.Type]
+		if infixFn == nil {
 			return leftExp
 		}
 		p.nextToken()
-		leftExp = infix(leftExp)
+		leftExp = infixFn(leftExp)
 	}
+
 	return leftExp
+}
+
+func (p *Parser) parsePrefixExpression() ast.Expression {
+	expression := &ast.PrefixExpression{
+		Token:    p.curToken,
+		Operator: p.curToken.Literal,
+	}
+	p.nextToken()
+	expression.Right = p.parseExpression(PREFIX)
+
+	return expression
+}
+
+func (p *Parser) parseInfixExpression(left ast.Expression) ast.Expression {
+	expression := &ast.InfixExpression{
+		Token:    p.curToken,
+		Operator: p.curToken.Literal,
+		Left:     left,
+	}
+	precedence := p.curPrecedence()
+	p.nextToken()
+	expression.Right = p.parseExpression(precedence)
+
+	return expression
 }
 
 func (p *Parser) parseIdentifier() ast.Expression {
@@ -228,16 +254,6 @@ func (p *Parser) noPrefixParseFnError(t token.TokenType) {
 	p.errors = append(p.errors, msg)
 }
 
-func (p *Parser) parsePrefixExpression() ast.Expression {
-	expression := &ast.PrefixExpression{
-		Token:    p.curToken,
-		Operator: p.curToken.Literal,
-	}
-	p.nextToken()
-	expression.Right = p.parseExpression(PREFIX)
-	return expression
-}
-
 func (p *Parser) peekPrecedence() int {
 	if p, ok := precedences[p.peekToken.Type]; ok {
 		return p
@@ -250,17 +266,4 @@ func (p *Parser) curPrecedence() int {
 		return p
 	}
 	return LOWEST
-}
-
-func (p *Parser) parseInfixExpression(left ast.Expression) ast.Expression {
-	expression := &ast.InfixExpression{
-		Token:    p.curToken,
-		Operator: p.curToken.Literal,
-		Left:     left,
-	}
-	precedence := p.curPrecedence()
-	p.nextToken()
-	expression.Right = p.parseExpression(precedence)
-
-	return expression
 }
