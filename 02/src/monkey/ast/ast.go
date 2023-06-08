@@ -44,7 +44,7 @@ func (p *Program) TokenLiteral() string {
 
 // LetSatement is a Statement
 type LetStatement struct {
-	Token token.Token // the token.LET token
+	Token token.Token // the token.LET
 	Name  *Identifier
 	Value Expression
 }
@@ -109,7 +109,6 @@ func (i *Identifier) TokenLiteral() string { return i.Token.Literal }
 func (i *Identifier) String() string       { return i.Value }
 
 // Integer Literal, e.g. the '1' in statement let x = 1
-// IntegerLiteral is an Expression
 type IntegerLiteral struct {
 	Token token.Token
 	Value int64 // special type
@@ -120,7 +119,6 @@ func (il *IntegerLiteral) TokenLiteral() string { return il.Token.Literal }
 func (il *IntegerLiteral) String() string       { return il.Token.Literal }
 
 // Prefix Expression, e.g. the '-1' in statement let x = -1
-// PrifixExpression is an Expression
 type PrefixExpression struct {
 	Token    token.Token // The prefix token, e.g. !
 	Operator string
@@ -130,10 +128,31 @@ type PrefixExpression struct {
 func (pe *PrefixExpression) expressionNode()      {}
 func (pe *PrefixExpression) TokenLiteral() string { return pe.Token.Literal }
 func (pe *PrefixExpression) String() string {
+	// add parentheses for debugging
 	var out bytes.Buffer
 	out.WriteString("(")
 	out.WriteString(pe.Operator)
 	out.WriteString(pe.Right.String())
+	out.WriteString(")")
+	return out.String()
+}
+
+type InfixExpression struct {
+	Token    token.Token // The operator token, e.g. + , -, *, /
+	Left Expression
+	Operator string
+	Right    Expression
+}
+
+func (oe *InfixExpression) expressionNode()      {}
+func (oe *InfixExpression) TokenLiteral() string { return oe.Token.Literal }
+func (oe *InfixExpression) String() string {
+	// add parentheses for debugging
+	var out bytes.Buffer
+	out.WriteString("(")
+	out.WriteString(oe.Left.String())
+	out.WriteString(" " + oe.Operator + " ")
+	out.WriteString(oe.Right.String())
 	out.WriteString(")")
 	return out.String()
 }
