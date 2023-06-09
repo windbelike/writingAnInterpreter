@@ -60,10 +60,12 @@ func New(l *lexer.Lexer) *Parser {
 	// prefix expression parser
 	p.prefixParseFns = make(map[token.TokenType]prefixParseFn)
 	// It's noteworthy that identifier and integer literal are prefix expressions.
-	p.registerPrefix(token.IDENT, p.parseIdentifier) 
-	p.registerPrefix(token.INT, p.parseIntegerLiteral) 
-	p.registerPrefix(token.BANG, p.parsePrefixExpression) 
-	p.registerPrefix(token.MINUS, p.parsePrefixExpression) 
+	p.registerPrefix(token.IDENT, p.parseIdentifier)
+	p.registerPrefix(token.INT, p.parseIntegerLiteral)
+	p.registerPrefix(token.BANG, p.parsePrefixExpression)
+	p.registerPrefix(token.MINUS, p.parsePrefixExpression)
+	p.registerPrefix(token.TRUE, p.parseBoolean)
+	p.registerPrefix(token.FALSE, p.parseBoolean)
 
 	// infix expression parser
 	p.infixParseFns = make(map[token.TokenType]infixParseFn)
@@ -266,4 +268,8 @@ func (p *Parser) curPrecedence() int {
 		return p
 	}
 	return LOWEST
+}
+
+func (p *Parser) parseBoolean() ast.Expression {
+	return &ast.Boolean{Token: p.curToken, Value: p.curTokenIs(token.TRUE)}
 }
