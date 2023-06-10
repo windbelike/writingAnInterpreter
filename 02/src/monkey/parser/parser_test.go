@@ -329,6 +329,10 @@ func TestParsingInfixExpressions(t *testing.T) {
 		if !testLiteralExpression(t, exp.Left, tt.leftValue) {
 			return
 		}
+		if exp.Operator != tt.operator {
+			t.Fatalf("exp.Operator is not '%s'. got=%s",
+				tt.operator, exp.Operator)
+		}
 		if !testLiteralExpression(t, exp.Right, tt.rightValue) {
 			return
 		}
