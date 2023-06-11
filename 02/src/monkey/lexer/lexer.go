@@ -1,6 +1,9 @@
 package lexer
 
-import "sawyer.com/v2/src/monkey/token"
+import (
+
+	"sawyer.com/v2/src/monkey/token"
+)
 
 // Lexer: turns input into tokens
 type Lexer struct {
@@ -26,6 +29,7 @@ func (l *Lexer) readChar() {
 	l.position = l.readPosition
 	l.readPosition += 1
 }
+
 
 func (l *Lexer) NextToken() token.Token {
 	var tok token.Token
