@@ -67,7 +67,8 @@ func New(l *lexer.Lexer) *Parser {
 	p.registerPrefix(token.TRUE, p.parseBoolean)
 	p.registerPrefix(token.FALSE, p.parseBoolean)
     p.registerPrefix(token.LPAREN, p.parseGroupedExpression) // parentheses is a prefix expression
-    p.registerPrefix(token.IF, p.parseIfExpression) // if expression is an prefix expression
+    p.registerPrefix(token.IF, p.parseIfExpression) // if expression is a prefix expression
+    p.registerPrefix(token.FUNCTION, p.parseFunctionLiteral) // function is a prefix expression
 
 	// infix expression parser
 	p.infixParseFns = make(map[token.TokenType]infixParseFn)
@@ -301,7 +302,9 @@ func (p *Parser) parseIfExpression() ast.Expression {
     if !p.expectPeek(token.LBRACE) {
         return nil
     }
+    // if statement
     expression.Consequence = p.parseBlockStatement()
+    // else statement
     if p.peekTokenIs(token.ELSE) {
         p.nextToken()
         if !p.expectPeek(token.LBRACE) {
@@ -328,3 +331,39 @@ func (p *Parser) parseBlockStatement() *ast.BlockStatement {
     return block 
 }
 
+func (p *Parser) parseFunctionLiteral() ast.Expression {
+    lit := &ast.FunctionLiteral{Token: p.curToken}
+    if !p.expectPeek(token.LPAREN) {
+        return nil
+    }
+    lit.Parameters = p.parseFunctionParameters()
+    if !p.expectPeek(token.LBRACE) {
+        return nil
+    }
+    lit.Body = p.parseBlockStatement()
+
+    return lit 
+}
+
+func (p *Parser) parseFunctionParameters() []*ast.Identifier {
+    identifiers := []*ast.Identifier{}
+    if p.peekTokenIs(token.RPAREN) {
+        // empty parameters
+        p.nextToken()
+        return identifiers 
+    }
+    p.nextToken()
+    ident := &ast.Identifier{Token: p.curToken, Value: p.curToken.Literal}
+    identifiers = append(identifiers, ident)
+    for p.peekTokenIs(token.COMMA) {
+        p.nextToken()
+        p.nextToken()
+        ident := &ast.Identifier{Token: p.curToken, Value: p.curToken.Literal}
+        identifiers = append(identifiers, ident)
+    }
+    if !p.expectPeek(token.RPAREN) {
+        return nil
+    }
+
+    return identifiers 
+}
