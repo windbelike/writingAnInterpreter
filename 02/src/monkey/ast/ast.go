@@ -205,7 +205,7 @@ func (bs *BlockStatement) String() string {
     return out.String() 
 }
 
-// Function literal is an Expression
+// Function literal is an expression
 type FunctionLiteral struct {
     Token token.Token // The 'fn' token 
     Parameters []*Identifier
@@ -227,3 +227,27 @@ func (fl *FunctionLiteral) String() string {
     return out.String() 
 }
 
+// Function call is an expression
+type CallExpression struct {
+    Token token.Token // The '(' token
+    // Identifier function call: callsFunction(2, 3, fn(x, y) { x + y; });
+    // FunctionLiteral function call: fn(x, y) { x + y } (1, 2)
+    Function Expression // Identifier or FunctionLiteral 
+    Arguments []Expression
+}
+func (ce *CallExpression) expressionNode() {}
+func (ce *CallExpression) TokenLiteral() string {
+    return ce.Token.Literal 
+}
+func (ce *CallExpression) String() string {
+    var out bytes.Buffer
+    args := []string{}
+    for _, a := range ce.Arguments {
+        args = append(args, a.String())
+    }
+    out.WriteString(ce.Function.String())
+    out.WriteString("(")
+    out.WriteString(strings.Join(args, ", "))
+    out.WriteString(")")
+    return out.String() 
+}
