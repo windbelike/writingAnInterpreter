@@ -63,7 +63,7 @@ func New(l *lexer.Lexer) *Parser {
 	// It's noteworthy that identifier and integer literal are prefix expressions.
 	p.registerPrefix(token.IDENT, p.parseIdentifier)
 	p.registerPrefix(token.INT, p.parseIntegerLiteral)
-	p.registerPrefix(token.BANG, p.parsePrefixExpression) // only 2 prefix expressions
+	p.registerPrefix(token.BANG, p.parsePrefixExpression)  // only 2 prefix expressions
 	p.registerPrefix(token.MINUS, p.parsePrefixExpression) // only 2 prefix expressions
 	p.registerPrefix(token.TRUE, p.parseBoolean)
 	p.registerPrefix(token.FALSE, p.parseBoolean)
@@ -142,31 +142,31 @@ func (p *Parser) parseStatement() ast.Statement {
 func (p *Parser) parseReturnStatement() *ast.ReturnStatement {
 	stmt := &ast.ReturnStatement{Token: p.curToken}
 	p.nextToken() // to read expressions
-    
-    stmt.ReturnValue = p.parseExpression(LOWEST)
-    if p.peekTokenIs(token.SEMICOLON) {
-        p.nextToken()
-    }
+
+	stmt.ReturnValue = p.parseExpression(LOWEST)
+	if p.peekTokenIs(token.SEMICOLON) {
+		p.nextToken()
+	}
 
 	return stmt
 }
 
 func (p *Parser) parseLetStatement() *ast.LetStatement {
-    stmt := &ast.LetStatement{Token: p.curToken}
-    if !p.expectPeek(token.IDENT) {
-        return nil
-    }
-    stmt.Name = &ast.Identifier{Token: p.curToken, Value: p.curToken.Literal}
-    if !p.expectPeek(token.ASSIGN) {
-        return nil
-    }
-    p.nextToken()
-    stmt.Value = p.parseExpression(LOWEST)
-    if p.peekTokenIs(token.SEMICOLON) {
-        p.nextToken()
-    }
+	stmt := &ast.LetStatement{Token: p.curToken}
+	if !p.expectPeek(token.IDENT) {
+		return nil
+	}
+	stmt.Name = &ast.Identifier{Token: p.curToken, Value: p.curToken.Literal}
+	if !p.expectPeek(token.ASSIGN) {
+		return nil
+	}
+	p.nextToken()
+	stmt.Value = p.parseExpression(LOWEST)
+	if p.peekTokenIs(token.SEMICOLON) {
+		p.nextToken()
+	}
 
-    return stmt
+	return stmt
 }
 
 // The core of expressiong parsing logic
