@@ -7,6 +7,7 @@ import (
 const (
 	INTEGER_OBJ = "INTEGER"
 	BOOLEAN_OBJ = "BOOLEAN"
+	NULL_OBJ    = "NULL"
 )
 
 type ObjectType string
@@ -27,4 +28,26 @@ func (i *Integer) Inspect() string {
 }
 func (i *Integer) Type() ObjectType {
 	return INTEGER_OBJ
+}
+
+// boolean is an object
+type Boolean struct {
+	Value bool
+}
+
+func (b *Boolean) Type() ObjectType {
+	return BOOLEAN_OBJ
+}
+func (b *Boolean) Inspect() string {
+	return fmt.Sprintf("%t", b.Value)
+}
+
+// null is an object
+type Null struct{}
+
+func (n *Null) Type() ObjectType {
+	return NULL_OBJ
+}
+func (n *Null) Inspect() string {
+	return "null"
 }
