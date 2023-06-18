@@ -2,9 +2,9 @@ package main
 
 import (
 	"fmt"
-	"sawyer.com/v3/src/monkey/repl"
 	"os"
 	"os/user"
+	"sawyer.com/v3/src/monkey/repl"
 )
 
 func main() {
