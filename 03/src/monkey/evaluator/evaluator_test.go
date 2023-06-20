@@ -202,7 +202,8 @@ func TestErrorHandling(t *testing.T) {
 		{
 			"if (10 > 1) { true + false; }",
 			"unknown operator: BOOLEAN + BOOLEAN",
-		}, {
+		}, 
+        {
 			`if (10 > 1) {
                   if (10 > 1) {
                     return true + false;
