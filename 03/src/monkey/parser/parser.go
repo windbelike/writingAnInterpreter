@@ -81,7 +81,7 @@ func New(l *lexer.Lexer) *Parser {
 	p.registerInfix(token.NOT_EQ, p.parseInfixExpression)
 	p.registerInfix(token.LT, p.parseInfixExpression)
 	p.registerInfix(token.GT, p.parseInfixExpression)
-	p.registerInfix(token.LPAREN, p.parseCallExpression) // function call is a infix expression
+	p.registerInfix(token.LPAREN, p.parseCallExpression) // function call is an infix expression
 
 	// Read two tokens, so curToken and peekToken are both set
 	p.nextToken()

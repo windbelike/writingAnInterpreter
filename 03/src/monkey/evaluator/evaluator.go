@@ -37,7 +37,8 @@ func Eval(node ast.Node, env *object.Environment) object.Object {
 		}
 		env.Set(node.Name.Value, val)
 	case *ast.FunctionLiteral:
-		// when meet a function definition, save the current env for the funtion
+        // this is how closure was implemented
+		// when meet a function definition, save the current env for the function
 		params := node.Parameters
 		body := node.Body
 		return &object.Function{Parameters: params, Env: env, Body: body}
@@ -213,7 +214,7 @@ func isTruthy(obj object.Object) bool {
 
 func evalProgram(program *ast.Program, env *object.Environment) object.Object {
 	var result object.Object
-	fmt.Printf("Program ast: \n %s \n", program)
+	// fmt.Printf("Program ast: \n %s \n", program)
 	for _, statement := range program.Statements {
 		result = Eval(statement, env)
 		switch result := result.(type) {
