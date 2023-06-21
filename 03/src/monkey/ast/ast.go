@@ -109,7 +109,8 @@ func (i *Identifier) expressionNode()      {}
 func (i *Identifier) TokenLiteral() string { return i.Token.Literal }
 func (i *Identifier) String() string       { return i.Value }
 
-// Integer Literal, e.g. the '1' in statement let x = 1
+// Integer Literal is an Expression
+// e.g. the '1' in statement let x = 1
 type IntegerLiteral struct {
 	Token token.Token
 	Value int64 // special type

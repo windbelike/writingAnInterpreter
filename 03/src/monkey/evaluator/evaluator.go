@@ -37,9 +37,23 @@ func Eval(node ast.Node, env *object.Environment) object.Object {
 		}
 		env.Set(node.Name.Value, val)
 	case *ast.FunctionLiteral:
+		// when meet a function definition, save the current env for the funtion
 		params := node.Parameters
 		body := node.Body
 		return &object.Function{Parameters: params, Env: env, Body: body}
+	case *ast.CallExpression:
+		// called by identifier or function literal
+        // get function literal
+		function := Eval(node.Function, env)
+		if isError(function) {
+			return function
+		}
+		args := evalExpressions(node.Arguments, env)
+		if len(args) == 1 && isError(args[0]) {
+			return args[0]
+		}
+
+		return applyFunction(function, args)
 	case *ast.Identifier:
 		return evalIdentifier(node, env)
 	// Expressions
@@ -101,7 +115,6 @@ func evalPrefixExpression(operator string, right object.Object) object.Object {
 	default:
 		return newError("unknown operator: %s %s", operator, right.Type())
 	}
-
 }
 
 func evalBangOperatorExpression(right object.Object) object.Object {
@@ -200,7 +213,7 @@ func isTruthy(obj object.Object) bool {
 
 func evalProgram(program *ast.Program, env *object.Environment) object.Object {
 	var result object.Object
-	// fmt.Printf("Program ast: \n %s \n", program)
+	fmt.Printf("Program ast: \n %s \n", program)
 	for _, statement := range program.Statements {
 		result = Eval(statement, env)
 		switch result := result.(type) {
@@ -224,6 +237,8 @@ func evalBlockStatement(block *ast.BlockStatement, env *object.Environment) obje
 			}
 		}
 	}
+
+    // choose the final experssion as result
 	return result
 }
 
@@ -246,4 +261,46 @@ func evalIdentifier(
 		return newError("identifier not found: " + node.Value)
 	}
 	return val
+}
+
+func evalExpressions(
+	exps []ast.Expression, env *object.Environment,
+) []object.Object {
+	var result []object.Object
+	for _, e := range exps {
+		evaluated := Eval(e, env)
+		if isError(evaluated) {
+			return []object.Object{evaluated}
+		}
+		result = append(result, evaluated)
+	}
+	return result
+}
+
+func applyFunction(fn object.Object, args []object.Object) object.Object {
+	function, ok := fn.(*object.Function)
+	if !ok {
+		return newError("not a function: %s", fn.Type())
+	}
+	extendedEnv := extendFunctionEnv(function, args)
+	evaluated := Eval(function.Body, extendedEnv)
+
+	return unwrapReturnValue(evaluated)
+}
+
+func extendFunctionEnv(fn *object.Function, args []object.Object,
+) *object.Environment {
+	env := object.NewEnclosedEnvironment(fn.Env)
+	// initialize paramiters as environment values
+	for paramIdx, param := range fn.Parameters {
+		env.Set(param.Value, args[paramIdx])
+	}
+	return env
+}
+
+func unwrapReturnValue(obj object.Object) object.Object {
+	if returnValue, ok := obj.(*object.ReturnValue); ok {
+		return returnValue.Value
+	}
+	return obj
 }
