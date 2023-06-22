@@ -37,14 +37,14 @@ func Eval(node ast.Node, env *object.Environment) object.Object {
 		}
 		env.Set(node.Name.Value, val)
 	case *ast.FunctionLiteral:
-        // this is how closure was implemented
+		// this is how closure was implemented
 		// when meet a function definition, save the current env for the function
 		params := node.Parameters
 		body := node.Body
 		return &object.Function{Parameters: params, Env: env, Body: body}
 	case *ast.CallExpression:
 		// called by identifier or function literal
-        // get function literal
+		// get function literal
 		function := Eval(node.Function, env)
 		if isError(function) {
 			return function
@@ -57,8 +57,9 @@ func Eval(node ast.Node, env *object.Environment) object.Object {
 		return applyFunction(function, args)
 	case *ast.Identifier:
 		return evalIdentifier(node, env)
-	// Expressions
-	// Prefix expressions
+		// Prefix expressions
+	case *ast.StringLiteral:
+		return &object.String{Value: node.Value}
 	case *ast.IntegerLiteral:
 		return &object.Integer{Value: node.Value}
 	case *ast.Boolean:
@@ -239,7 +240,7 @@ func evalBlockStatement(block *ast.BlockStatement, env *object.Environment) obje
 		}
 	}
 
-    // choose the final experssion as result
+	// choose the final experssion as result
 	return result
 }
 

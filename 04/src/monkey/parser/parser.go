@@ -63,13 +63,14 @@ func New(l *lexer.Lexer) *Parser {
 	// It's noteworthy that identifier and integer literal are prefix expressions.
 	p.registerPrefix(token.IDENT, p.parseIdentifier)
 	p.registerPrefix(token.INT, p.parseIntegerLiteral)
-	p.registerPrefix(token.BANG, p.parsePrefixExpression) // only 2 prefix expressions
+	p.registerPrefix(token.BANG, p.parsePrefixExpression)  // only 2 prefix expressions
 	p.registerPrefix(token.MINUS, p.parsePrefixExpression) // only 2 prefix expressions
 	p.registerPrefix(token.TRUE, p.parseBoolean)
 	p.registerPrefix(token.FALSE, p.parseBoolean)
 	p.registerPrefix(token.LPAREN, p.parseGroupedExpression) // parentheses is a prefix expression
 	p.registerPrefix(token.IF, p.parseIfExpression)          // if expression is a prefix expression
 	p.registerPrefix(token.FUNCTION, p.parseFunctionLiteral) // function literal is a prefix expression
+	p.registerPrefix(token.STRING, p.parseStringLiteral)     // string literial is a prefix expression
 
 	// infix expression parser
 	p.infixParseFns = make(map[token.TokenType]infixParseFn)
@@ -143,32 +144,32 @@ func (p *Parser) parseReturnStatement() *ast.ReturnStatement {
 	stmt := &ast.ReturnStatement{Token: p.curToken}
 	p.nextToken() // to read expressions
 
-    // fmt.Printf("parseReturnStatement, %s \n", stmt)
-    
-    stmt.ReturnValue = p.parseExpression(LOWEST)
-    if p.peekTokenIs(token.SEMICOLON) {
-        p.nextToken()
-    }
+	// fmt.Printf("parseReturnStatement, %s \n", stmt)
+
+	stmt.ReturnValue = p.parseExpression(LOWEST)
+	if p.peekTokenIs(token.SEMICOLON) {
+		p.nextToken()
+	}
 
 	return stmt
 }
 
 func (p *Parser) parseLetStatement() *ast.LetStatement {
-    stmt := &ast.LetStatement{Token: p.curToken}
-    if !p.expectPeek(token.IDENT) {
-        return nil
-    }
-    stmt.Name = &ast.Identifier{Token: p.curToken, Value: p.curToken.Literal}
-    if !p.expectPeek(token.ASSIGN) {
-        return nil
-    }
-    p.nextToken()
-    stmt.Value = p.parseExpression(LOWEST)
-    if p.peekTokenIs(token.SEMICOLON) {
-        p.nextToken()
-    }
+	stmt := &ast.LetStatement{Token: p.curToken}
+	if !p.expectPeek(token.IDENT) {
+		return nil
+	}
+	stmt.Name = &ast.Identifier{Token: p.curToken, Value: p.curToken.Literal}
+	if !p.expectPeek(token.ASSIGN) {
+		return nil
+	}
+	p.nextToken()
+	stmt.Value = p.parseExpression(LOWEST)
+	if p.peekTokenIs(token.SEMICOLON) {
+		p.nextToken()
+	}
 
-    return stmt
+	return stmt
 }
 
 // The core of expressiong parsing logic
@@ -243,7 +244,7 @@ func (p *Parser) expectPeek(t token.TokenType) bool {
 
 func (p *Parser) parseExpressionStatement() *ast.ExpressionStatement {
 	stmt := &ast.ExpressionStatement{Token: p.curToken}
-    // fmt.Printf("parseExpressionStatement %s\n", stmt)
+	// fmt.Printf("parseExpressionStatement %s\n", stmt)
 	stmt.Expression = p.parseExpression(LOWEST)
 	if p.peekTokenIs(token.SEMICOLON) {
 		p.nextToken()
@@ -401,4 +402,8 @@ func (p *Parser) parseCallArguments() []ast.Expression {
 	}
 
 	return args
+}
+
+func (p *Parser) parseStringLiteral() ast.Expression {
+	return &ast.StringLiteral{Token: p.curToken, Value: p.curToken.Literal}
 }
