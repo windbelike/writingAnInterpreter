@@ -1,7 +1,6 @@
 package lexer
 
 import (
-
 	"sawyer.com/v4/src/monkey/token"
 )
 
@@ -20,6 +19,7 @@ func New(input string) *Lexer {
 }
 
 // todo Unicode or Emoji support
+// ASCII only
 func (l *Lexer) readChar() {
 	if l.readPosition >= len(l.input) {
 		l.ch = 0 // reached the end of the input, set 0 which is ASCII code for the "NUL" character
@@ -30,6 +30,16 @@ func (l *Lexer) readChar() {
 	l.readPosition += 1
 }
 
+func (l *Lexer) readString() string {
+	position := l.position + 1
+	for {
+		l.readChar()
+		if l.ch == '"' || l.ch == 0 {
+			break
+		}
+	}
+	return l.input[position:l.position]
+}
 
 func (l *Lexer) NextToken() token.Token {
 	var tok token.Token
@@ -80,6 +90,10 @@ func (l *Lexer) NextToken() token.Token {
 	case 0:
 		tok.Literal = ""
 		tok.Type = token.EOF
+	case '"':
+		// string literals
+		tok.Type = token.STRING
+		tok.Literal = l.readString()
 	default:
 		if isLetter(l.ch) {
 			tok.Literal = l.readIdentifier() // identifier or keywords
