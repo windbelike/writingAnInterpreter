@@ -87,6 +87,11 @@ func (l *Lexer) NextToken() token.Token {
 		tok = newToken(token.LBRACE, l.ch)
 	case '}':
 		tok = newToken(token.RBRACE, l.ch)
+		// array indexing operation
+	case '[':
+		tok = newToken(token.LBRACKET, l.ch)
+	case ']':
+		tok = newToken(token.RBRACKET, l.ch)
 	case 0:
 		tok.Literal = ""
 		tok.Type = token.EOF
@@ -96,10 +101,12 @@ func (l *Lexer) NextToken() token.Token {
 		tok.Literal = l.readString()
 	default:
 		if isLetter(l.ch) {
-			tok.Literal = l.readIdentifier() // identifier or keywords
+			// identifiers or keywords
+			tok.Literal = l.readIdentifier()
 			tok.Type = token.LookupIdent(tok.Literal)
 			return tok
 		} else if isDigit(l.ch) {
+			// integer literals
 			tok.Type = token.INT
 			tok.Literal = l.readNumber()
 			return tok

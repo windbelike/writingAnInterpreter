@@ -25,9 +25,9 @@ const (
 	EOF     = "EOF"
 
 	// Identifiers and literals
-	IDENT = "IDENT" // add, foobar, x, y, ...
-	INT   = "INT"   // 1343456
-    STRING = "STRING" // string literals
+	IDENT  = "IDENT"  // add, foobar, x, y, ...
+	INT    = "INT"    // 1343456
+	STRING = "STRING" // string literals
 
 	// Operators
 	ASSIGN   = "="
@@ -37,12 +37,14 @@ const (
 	ASTERISK = "*"
 	SLASH    = "/"
 
+	LBRACKET = "["
+	RBRACKET = "]"
+
 	LT = "<"
 	GT = ">"
 
 	EQ     = "=="
 	NOT_EQ = "!="
-	
 
 	// Delimiters
 	COMMA     = ","
@@ -67,4 +69,3 @@ type Token struct {
 	Type    TokenType
 	Literal string
 }
-
