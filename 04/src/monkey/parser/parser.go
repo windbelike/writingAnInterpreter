@@ -21,6 +21,7 @@ const (
 	PRODUCT     //*
 	PREFIX      //-Xor!X
 	CALL        // myFunction(X)
+    INDEX       // myArray[2], array indexing
 )
 
 var precedences = map[token.TokenType]int{
@@ -33,6 +34,7 @@ var precedences = map[token.TokenType]int{
 	token.SLASH:    PRODUCT,
 	token.ASTERISK: PRODUCT,
 	token.LPAREN:   CALL,
+    token.LBRACKET: INDEX,
 }
 
 // The Pratt Parser
@@ -83,7 +85,8 @@ func New(l *lexer.Lexer) *Parser {
 	p.registerInfix(token.NOT_EQ, p.parseInfixExpression)
 	p.registerInfix(token.LT, p.parseInfixExpression)
 	p.registerInfix(token.GT, p.parseInfixExpression)
-	p.registerInfix(token.LPAREN, p.parseCallExpression) // function call is an infix expression
+	p.registerInfix(token.LPAREN, p.parseCallExpression)    // function call is an infix expression
+	p.registerInfix(token.LBRACKET, p.parseIndexExpression) // array indexing is an infix expression
 
 	// Read two tokens, so curToken and peekToken are both set
 	p.nextToken()
@@ -173,7 +176,7 @@ func (p *Parser) parseLetStatement() *ast.LetStatement {
 	return stmt
 }
 
-// The core of expressiong parsing logic
+// The core of expression parsing logic
 func (p *Parser) parseExpression(precedence int) ast.Expression {
 	// parsing prefix expression
 	prefixFn := p.prefixParseFns[p.curToken.Type]
@@ -184,7 +187,7 @@ func (p *Parser) parseExpression(precedence int) ast.Expression {
 	leftExp := prefixFn()
 
 	// parsing infix expression
-	// recursively finding the token has a higher precedence
+	// recursively finding the token has a higher precedence, and parse then first
 	for !p.peekTokenIs(token.SEMICOLON) && precedence < p.peekPrecedence() {
 		infixFn := p.infixParseFns[p.peekToken.Type]
 		if infixFn == nil {
@@ -380,7 +383,7 @@ func (p *Parser) parseFunctionParameters() []*ast.Identifier {
 
 func (p *Parser) parseCallExpression(function ast.Expression) ast.Expression {
 	exp := &ast.CallExpression{Token: p.curToken, Function: function}
-    exp.Arguments = p.parseExpressionList(token.RPAREN)
+	exp.Arguments = p.parseExpressionList(token.RPAREN)
 
 	return exp
 }
@@ -433,4 +436,14 @@ func (p *Parser) parseExpressionList(end token.TokenType) []ast.Expression {
 		return nil
 	}
 	return list
+}
+
+func (p *Parser) parseIndexExpression(left ast.Expression) ast.Expression {
+	exp := &ast.IndexExpression{Token: p.curToken, Left: left}
+	p.nextToken()
+	exp.Index = p.parseExpression(LOWEST)
+	if !p.expectPeek(token.RBRACKET) {
+		return nil
+	}
+	return exp
 }

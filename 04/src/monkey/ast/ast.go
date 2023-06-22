@@ -8,8 +8,8 @@ import (
 )
 
 type Node interface {
-    TokenLiteral() string // token literals like: let, somVal, fn, etc
-	String() string // some info for debugging
+	TokenLiteral() string // token literals like: let, somVal, fn, etc
+	String() string       // some info for debugging
 }
 
 type Statement interface {
@@ -266,11 +266,10 @@ func (sl *StringLiteral) expressionNode()      {}
 func (sl *StringLiteral) TokenLiteral() string { return sl.Token.Literal }
 func (sl *StringLiteral) String() string       { return sl.Token.Literal }
 
-
 // Array is an expression
 type ArrayLiteral struct {
-	Token token.Token // the '[' token
-    Elements []Expression
+	Token    token.Token // the '[' token
+	Elements []Expression
 }
 
 func (al *ArrayLiteral) expressionNode()      {}
@@ -284,5 +283,24 @@ func (al *ArrayLiteral) String() string {
 	out.WriteString("[")
 	out.WriteString(strings.Join(elements, ", "))
 	out.WriteString("]")
+	return out.String()
+}
+
+// array indexing is an expression
+type IndexExpression struct {
+	Token token.Token // The [ token
+	Left  Expression
+	Index Expression
+}
+
+func (ie *IndexExpression) expressionNode()      {}
+func (ie *IndexExpression) TokenLiteral() string { return ie.Token.Literal }
+func (ie *IndexExpression) String() string {
+	var out bytes.Buffer
+	out.WriteString("(")
+	out.WriteString(ie.Left.String())
+	out.WriteString("[")
+	out.WriteString(ie.Index.String())
+	out.WriteString("])")
 	return out.String()
 }
