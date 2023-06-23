@@ -87,6 +87,8 @@ func (l *Lexer) NextToken() token.Token {
 		tok = newToken(token.LBRACE, l.ch)
 	case '}':
 		tok = newToken(token.RBRACE, l.ch)
+	case ':':
+		tok = newToken(token.COLON, l.ch)
 		// array indexing operation
 	case '[':
 		tok = newToken(token.LBRACKET, l.ch)

@@ -21,7 +21,7 @@ const (
 	PRODUCT     //*
 	PREFIX      //-Xor!X
 	CALL        // myFunction(X)
-    INDEX       // myArray[2], array indexing
+	INDEX       // myArray[2], array indexing
 )
 
 var precedences = map[token.TokenType]int{
@@ -34,7 +34,7 @@ var precedences = map[token.TokenType]int{
 	token.SLASH:    PRODUCT,
 	token.ASTERISK: PRODUCT,
 	token.LPAREN:   CALL,
-    token.LBRACKET: INDEX,
+	token.LBRACKET: INDEX,
 }
 
 // The Pratt Parser
@@ -74,6 +74,7 @@ func New(l *lexer.Lexer) *Parser {
 	p.registerPrefix(token.FUNCTION, p.parseFunctionLiteral) // function literal is a prefix expression
 	p.registerPrefix(token.STRING, p.parseStringLiteral)     // string literial is a prefix expression
 	p.registerPrefix(token.LBRACKET, p.parseArrayLiteral)    // array literal is a prefix expression
+	p.registerPrefix(token.LBRACE, p.parseHashLiteral)       // hash literal is a prefix expression
 
 	// infix expression parser
 	p.infixParseFns = make(map[token.TokenType]infixParseFn)
@@ -446,4 +447,26 @@ func (p *Parser) parseIndexExpression(left ast.Expression) ast.Expression {
 		return nil
 	}
 	return exp
+}
+
+func (p *Parser) parseHashLiteral() ast.Expression {
+	hash := &ast.HashLiteral{Token: p.curToken}
+	hash.Pairs = make(map[ast.Expression]ast.Expression)
+	for !p.peekTokenIs(token.RBRACE) {
+		p.nextToken()
+		key := p.parseExpression(LOWEST)
+		if !p.expectPeek(token.COLON) {
+			return nil
+		}
+		p.nextToken()
+		value := p.parseExpression(LOWEST)
+		hash.Pairs[key] = value
+		if !p.peekTokenIs(token.RBRACE) && !p.expectPeek(token.COMMA) {
+			return nil
+		}
+	}
+	if !p.expectPeek(token.RBRACE) {
+		return nil
+	}
+	return hash
 }
