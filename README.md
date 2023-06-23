@@ -1,4 +1,4 @@
-# writingAnInterpreter
+# Writing An Interpreter
 
 For learning purpose.
 
