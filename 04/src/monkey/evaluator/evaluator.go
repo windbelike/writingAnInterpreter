@@ -406,3 +406,4 @@ func evalHashIndexExpression(hash, index object.Object) object.Object {
 	}
 	return pair.Value
 }
+
