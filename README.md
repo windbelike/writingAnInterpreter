@@ -10,7 +10,7 @@
 
 ### Debug Mode
 
-Append `-d` arguments to show the shape of the AST while parsing.
+Append `-d` argument to show the shape of the AST while parsing.
 
 `$ go run ./src/main -d`
 
@@ -20,6 +20,7 @@ Append `-d` arguments to show the shape of the AST while parsing.
 2. Parser
 3. Evaluator
 4. REPL ( **R**ead **E**valuate **P**rint **L**oop )
+5. Builtin Functions
 
 ## Features
 
