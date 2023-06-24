@@ -13,7 +13,7 @@ func init() {
 	debugSwitch = flag.Bool("d", false, "debug switch")
 }
 
-const traceIdentPlaceholder string = "\t"
+const traceIdentPlaceholder string = "  "
 
 func identLevel() string {
 	return strings.Repeat(traceIdentPlaceholder, traceLevel-1)

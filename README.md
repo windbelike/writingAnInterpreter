@@ -4,13 +4,22 @@
 
 # Getting Started
 
-`$ go run ./04/src/main`
+### Enter the REPL
+
+`$ go run ./src/main`
 
 ### Debug Mode
 
-Append `-d` arguments to show the shape of the AST.
+Append `-d` arguments to show the shape of the AST while parsing.
 
-`$ go run -d ./04/src/main`
+`$ go run ./src/main -d`
+
+## Components
+
+1. Lexer
+2. Parser
+3. Evaluator
+4. REPL ( **R**ead **E**valuate **P**rint **L**oop )
 
 ## Features
 
@@ -20,6 +29,7 @@ Append `-d` arguments to show the shape of the AST.
 - Array
 - Hash
 - Function
+- Builtin Function
 - Closure
 
 - Prefix Expression
@@ -27,8 +37,6 @@ Append `-d` arguments to show the shape of the AST.
 - Index Expression
 - If Expression
 - Return Statements
-
-
 
 ## References
 
