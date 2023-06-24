@@ -37,7 +37,7 @@ Append `-d` argument to show the shape of the AST while parsing.
 - Infix Expression
 - Index Expression
 - If Expression
-- Return Statements
+- Return Statement
 
 ## References
 
