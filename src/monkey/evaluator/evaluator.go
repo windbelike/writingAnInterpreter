@@ -313,7 +313,11 @@ func applyFunction(fn object.Object, args []object.Object) object.Object {
 		// when meeting the return statement, gotta unwrap it
 		return unwrapReturnValue(evaluated)
 	case *object.Builtin:
-		return fn.Fn(args...)
+        if fn.Fn != nil {
+            return fn.Fn(args...)
+        } else {
+            return fn.Id
+        }
 	default:
 		return newError("not a function: %s", fn.Type())
 	}
