@@ -28,6 +28,8 @@ func TestNextToken(t *testing.T) {
     "foo bar"
     [1, 2];
     {"foo": "bar"}
+    1 <= 2
+    2 >= 3
    `
 
 	tests := []struct {
@@ -120,6 +122,12 @@ func TestNextToken(t *testing.T) {
 		{token.COLON, ":"},
 		{token.STRING, "bar"},
 		{token.RBRACE, "}"},
+        {token.INT, "1"},
+        {token.LE, "<="},
+        {token.INT, "2"},
+        {token.INT, "2"},
+        {token.GE, ">="},
+        {token.INT, "3"},
 		{token.EOF, ""},
 	}
 	l := New(input)
