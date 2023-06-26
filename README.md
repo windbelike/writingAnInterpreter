@@ -20,7 +20,7 @@ Append `-d` argument to show the shape of the AST while parsing.
 2. Parser
 3. Evaluator
 4. REPL ( **R**ead **E**valuate **P**rint **L**oop )
-5. Builtin Functions
+5. Builtin Function
 
 ## Features
 
@@ -37,7 +37,7 @@ Append `-d` argument to show the shape of the AST while parsing.
 - Infix Expression
 - Index Expression
 - If Expression
-- Return Statements
+- Return Statement
 
 ## References
 

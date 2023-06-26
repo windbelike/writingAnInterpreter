@@ -120,6 +120,24 @@ func evalStatements(stmts []ast.Statement, env *object.Environment) object.Objec
 	return result
 }
 
+func evalLogicalInfixExpression(operator string, left, right object.Object) object.Object {
+    leftVal := left.(*object.Boolean)
+    rightVal := right.(*object.Boolean)
+	switch operator {
+	case "&&":
+		return nativeBoolToBooleanObject(leftVal.Value && rightVal.Value)
+	case "||":
+		return nativeBoolToBooleanObject(leftVal.Value || rightVal.Value)
+	case "==":
+		return nativeBoolToBooleanObject(left == right)
+	case "!=":
+		return nativeBoolToBooleanObject(left != right)
+	default:
+		return newError("unknown operator: %s %s %s",
+			left.Type(), operator, right.Type())
+	}
+}
+
 func nativeBoolToBooleanObject(input bool) *object.Boolean {
 	if input {
 		return TRUE
@@ -163,15 +181,13 @@ func evalInfixExpression(operator string, left, right object.Object) object.Obje
 	switch {
 	case left.Type() == object.INTEGER_OBJ && right.Type() == object.INTEGER_OBJ:
 		return evalIntegerInfixExpression(operator, left, right)
-	case operator == "==":
-		return nativeBoolToBooleanObject(left == right)
-	case operator == "!=":
-		return nativeBoolToBooleanObject(left != right)
+	case left.Type() == object.STRING_OBJ && right.Type() == object.STRING_OBJ:
+		return evalStringInfixExpression(operator, left, right)
+    case left.Type() == object.BOOLEAN_OBJ && right.Type() == object.BOOLEAN_OBJ:
+		return evalLogicalInfixExpression(operator, left, right)
 	case left.Type() != right.Type():
 		return newError("type mismatch: %s %s %s",
 			left.Type(), operator, right.Type())
-	case left.Type() == object.STRING_OBJ && right.Type() == object.STRING_OBJ:
-		return evalStringInfixExpression(operator, left, right)
 	default:
 		return newError("unknown operator: %s %s %s", left.Type(), operator, right.Type())
 	}
@@ -196,6 +212,10 @@ func evalIntegerInfixExpression(
 		return nativeBoolToBooleanObject(leftVal < rightVal)
 	case ">":
 		return nativeBoolToBooleanObject(leftVal > rightVal)
+	case "<=":
+		return nativeBoolToBooleanObject(leftVal <= rightVal)
+	case ">=":
+		return nativeBoolToBooleanObject(leftVal >= rightVal)
 	case "==":
 		return nativeBoolToBooleanObject(leftVal == rightVal)
 	case "!=":
@@ -313,11 +333,11 @@ func applyFunction(fn object.Object, args []object.Object) object.Object {
 		// when meeting the return statement, gotta unwrap it
 		return unwrapReturnValue(evaluated)
 	case *object.Builtin:
-        if fn.Fn != nil {
-            return fn.Fn(args...)
-        } else {
-            return fn.Id
-        }
+		if fn.Fn != nil {
+			return fn.Fn(args...)
+		} else {
+			return fn.Id
+		}
 	default:
 		return newError("not a function: %s", fn.Type())
 	}
@@ -410,4 +430,3 @@ func evalHashIndexExpression(hash, index object.Object) object.Object {
 	}
 	return pair.Value
 }
-

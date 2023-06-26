@@ -30,6 +30,9 @@ func TestNextToken(t *testing.T) {
     {"foo": "bar"}
     true && false
     true || false
+    1 <= 2
+    2 >= 3
+
    `
 
 	tests := []struct {
@@ -128,6 +131,12 @@ func TestNextToken(t *testing.T) {
         {token.TRUE, "true"},
         {token.OR, "||"},
         {token.FALSE, "false"},
+        {token.INT, "1"},
+        {token.LE, "<="},
+        {token.INT, "2"},
+        {token.INT, "2"},
+        {token.GE, ">="},
+        {token.INT, "3"},
 		{token.EOF, ""},
 	}
 	l := New(input)
