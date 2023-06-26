@@ -42,9 +42,12 @@ const (
 
 	LT = "<"
 	GT = ">"
-
 	EQ     = "=="
 	NOT_EQ = "!="
+
+	// Binary Operator
+	AND = "&&"
+	OR  = "||"
 
 	// Delimiters
 	COMMA     = ","
