@@ -161,17 +161,27 @@ type String struct {
 func (s *String) Type() ObjectType { return STRING_OBJ }
 func (s *String) Inspect() string  { return s.Value }
 
-// this just a type, a function without body
+// just a type, a function without body
 // builtin function API
 type BuiltinFunction func(args ...Object) Object
 
+type BuiltinIdentifier Object
+
 // Builtin is an object
 type Builtin struct {
-	Fn BuiltinFunction
+    Name string
+	Fn BuiltinFunction 
+    Id BuiltinIdentifier
 }
 
 func (b *Builtin) Type() ObjectType { return BUILTIN_OBJ }
-func (b *Builtin) Inspect() string  { return "builtin function" }
+func (b *Builtin) Inspect() string  { 
+    if b.Fn != nil {
+        return "builtin functon: " + b.Name
+    } else {
+        return "builtin identifier: " + b.Name
+    }
+}
 
 // array is an object
 type Array struct {

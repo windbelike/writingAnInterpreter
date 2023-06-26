@@ -48,6 +48,10 @@ const (
 	EQ     = "=="
 	NOT_EQ = "!="
 
+	// Binary Operator
+	AND = "&&"
+	OR  = "||"
+
 	// Delimiters
 	COMMA     = ","
 	SEMICOLON = ";"
