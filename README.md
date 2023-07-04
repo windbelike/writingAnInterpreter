@@ -39,6 +39,10 @@ Append `-d` argument to show the shape of the AST while parsing.
 - If Expression
 - Return Statement
 
+## Interpreter Procedures
+
+![Interpreter](README/Interpreter.png)
+
 ## References
 
 Based on the book: https://interpreterbook.com/
